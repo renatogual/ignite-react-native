@@ -1,3 +1,7 @@
+import { useCallback, useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
+
 import {
   Container,
   Header,
@@ -26,32 +30,50 @@ export interface DataListProps extends TransactionCardProps {
 }
 
 export function Dashboard() {
-  const data: DataListProps[] = [
-    {
-      id: '1',
-      type: 'positive',
-      title: 'Desenvolvimento de site',
-      amount: 'R$ 12.000,00',
-      category: { name: 'Vendas', icon: 'dollar-sign' },
-      date: '13/04/2020',
-    },
-    {
-      id: '2',
-      type: 'negative',
-      title: 'Restaurante',
-      amount: 'R$ 59,00',
-      category: { name: 'Alimentação', icon: 'coffee' },
-      date: '13/04/2020',
-    },
-    {
-      id: '3',
-      type: 'negative',
-      title: 'Aluguel do apartamento',
-      amount: 'R$ 1.200,00',
-      category: { name: 'Casa', icon: 'shopping-bag' },
-      date: '13/04/2020',
-    },
-  ]
+  const [data, setData] = useState<DataListProps[]>([])
+
+  const loadStorageData = useCallback(async () => {
+    const storageKey = '@gofinances:transactions'
+
+    const response = await AsyncStorage.getItem(storageKey)
+
+    const transactions = response ? JSON.parse(response) : []
+
+    const transactionsFormatted: DataListProps[] = transactions.map(
+      (item: DataListProps) => {
+        const amount = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }).format(Number(item.amount))
+
+        const date = new Date(item.date)
+        const dateFormatted = date.toLocaleDateString('pt-BR')
+
+        return {
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          type: item.type,
+          amount,
+          date: dateFormatted,
+        }
+      }
+    )
+
+    console.log(transactionsFormatted)
+
+    setData(transactionsFormatted)
+  }, [])
+
+  useEffect(() => {
+    loadStorageData()
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadStorageData()
+    }, [])
+  )
 
   return (
     <Container>
@@ -104,6 +126,7 @@ export function Dashboard() {
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <TransactionCard data={item} />}
+          ListEmptyComponent={() => <Title>Não há transações ainda</Title>}
         />
       </Transactions>
     </Container>
