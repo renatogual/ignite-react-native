@@ -29,7 +29,12 @@ interface Props {
 }
 
 export function TransactionCard({ data }: Props) {
-  const amount = data.type === 'down' ? `- ${data.amount}` : data.amount
+  const amountFormatted = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(Number(data.amount))
+
+  const amount = data.type === 'down' ? `- ${amountFormatted}` : amountFormatted
 
   const category = categories.filter(
     (category) => String(category.key) === String(data.category)

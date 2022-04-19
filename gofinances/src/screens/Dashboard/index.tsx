@@ -25,12 +25,25 @@ import {
   TransactionCardProps,
 } from '../../components/TransactionCard'
 
-export interface DataListProps extends TransactionCardProps {
+export interface TransactionsProps extends TransactionCardProps {
   id: string
 }
 
+interface HighlightCardProps {
+  total: number
+  lastTransaction: string
+}
+
+interface HighlightCardData {
+  entries: HighlightCardProps
+  outputs: HighlightCardProps
+}
+
 export function Dashboard() {
-  const [data, setData] = useState<DataListProps[]>([])
+  const [transactions, setTransactions] = useState<TransactionsProps[]>([])
+  const [highlightCardData, setHighlightCardData] = useState<HighlightCardData>(
+    {} as HighlightCardData
+  )
 
   const loadStorageData = useCallback(async () => {
     const storageKey = '@gofinances:transactions'
@@ -39,12 +52,16 @@ export function Dashboard() {
 
     const transactions = response ? JSON.parse(response) : []
 
-    const transactionsFormatted: DataListProps[] = transactions.map(
-      (item: DataListProps) => {
-        const amount = new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }).format(Number(item.amount))
+    let totalEntries = 0
+    let totalOutputs = 0
+
+    const transactionsFormatted: TransactionsProps[] = transactions.map(
+      (item: TransactionsProps) => {
+        if (item.type === 'up') {
+          totalEntries += Number(item.amount)
+        } else {
+          totalOutputs += Number(item.amount)
+        }
 
         const date = new Date(item.date)
         const dateFormatted = date.toLocaleDateString('pt-BR')
@@ -54,15 +71,45 @@ export function Dashboard() {
           name: item.name,
           category: item.category,
           type: item.type,
-          amount,
+          amount: item.amount,
           date: dateFormatted,
         }
       }
     )
 
-    console.log(transactionsFormatted)
+    const lastTransactionEntriesDate = new Date(
+      transactions
+        .filter((transaction: TransactionsProps) => transaction.type === 'up')
+        .slice(-1)
+        .pop().date
+    ).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
 
-    setData(transactionsFormatted)
+    const lastTransactionOutputsDate = new Date(
+      transactions
+        .filter((transaction: TransactionsProps) => transaction.type === 'down')
+        .slice(-1)
+        .pop().date
+    ).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
+
+    setTransactions(transactionsFormatted)
+    setHighlightCardData({
+      entries: {
+        total: totalEntries,
+        lastTransaction: lastTransactionEntriesDate,
+      },
+      outputs: {
+        total: totalOutputs,
+        lastTransaction: lastTransactionOutputsDate,
+      },
+    })
   }, [])
 
   useEffect(() => {
@@ -101,20 +148,23 @@ export function Dashboard() {
       <HighlightCards>
         <HighlightCard
           title='Entradas'
-          amount='R$ 17.400,00'
-          lastTransaction='Última entrada dia 13 de abril'
+          amount={highlightCardData?.entries?.total}
+          lastTransaction={`Última entrada dia ${highlightCardData?.entries?.lastTransaction}`}
           type='up'
         />
         <HighlightCard
           title='Saídas'
-          amount='R$ 1.259,00'
-          lastTransaction='Última entrada dia 03 de abril'
+          amount={highlightCardData?.outputs?.total}
+          lastTransaction={`Última saída dia ${highlightCardData?.outputs?.lastTransaction}`}
           type='down'
         />
         <HighlightCard
           title='Entradas'
-          amount='R$ 16.141,00'
-          lastTransaction='01 à 16 de abril'
+          amount={
+            highlightCardData?.entries?.total -
+            highlightCardData?.outputs?.total
+          }
+          lastTransaction={`01 à ${highlightCardData?.outputs?.lastTransaction}`}
           type='total'
         />
       </HighlightCards>
@@ -123,7 +173,7 @@ export function Dashboard() {
         <Title>Listagem</Title>
 
         <TransactionList
-          data={data}
+          data={transactions?.reverse()}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <TransactionCard data={item} />}
           ListEmptyComponent={() => <Title>Não há transações ainda</Title>}
