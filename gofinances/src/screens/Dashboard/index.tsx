@@ -47,9 +47,7 @@ export function Dashboard() {
 
   const loadStorageData = useCallback(async () => {
     const storageKey = '@gofinances:transactions'
-
     const response = await AsyncStorage.getItem(storageKey)
-
     const transactions = response ? JSON.parse(response) : []
 
     let totalEntries = 0
@@ -81,7 +79,7 @@ export function Dashboard() {
       transactions
         .filter((transaction: TransactionsProps) => transaction.type === 'up')
         .slice(-1)
-        .pop().date
+        .pop()?.date
     ).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -92,7 +90,7 @@ export function Dashboard() {
       transactions
         .filter((transaction: TransactionsProps) => transaction.type === 'down')
         .slice(-1)
-        .pop().date
+        .pop()?.date
     ).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',

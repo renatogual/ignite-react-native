@@ -1,4 +1,4 @@
-import React from 'react'
+import { StatusBar } from 'react-native'
 import { ThemeProvider } from 'styled-components'
 import AppLoading from 'expo-app-loading'
 
@@ -31,6 +31,12 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <NavigationContainer>
+        {/* Para deixar os icones do status bar em branco devido o header ser colorido */}
+        <StatusBar
+          barStyle='light-content'
+          backgroundColor='transparent'
+          translucent
+        />
         <AppRoutes />
       </NavigationContainer>
     </ThemeProvider>
