@@ -25,6 +25,8 @@ import {
   TransactionCardProps,
 } from '../../components/TransactionCard'
 
+import { useAuth } from '../../hooks/auth'
+
 export interface TransactionsProps extends TransactionCardProps {
   id: string
 }
@@ -40,13 +42,35 @@ interface HighlightCardData {
 }
 
 export function Dashboard() {
+  const { user, signOut } = useAuth()
+
   const [transactions, setTransactions] = useState<TransactionsProps[]>([])
   const [highlightCardData, setHighlightCardData] = useState<HighlightCardData>(
     {} as HighlightCardData
   )
 
+  function formattedDate(
+    transactions: TransactionsProps[],
+    type: 'up' | 'down'
+  ) {
+    if (transactions.length === 0) {
+      return ''
+    } else {
+      const transactionsFiltered: any = transactions
+        .filter((transaction) => transaction.type === type)
+        .slice(-1)
+        .pop()?.date
+
+      return new Date(transactionsFiltered).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      })
+    }
+  }
+
   const loadStorageData = useCallback(async () => {
-    const storageKey = '@gofinances:transactions'
+    const storageKey = `@gofinances:transactions_user:${user.id}`
     const response = await AsyncStorage.getItem(storageKey)
     const transactions = response ? JSON.parse(response) : []
 
@@ -75,27 +99,9 @@ export function Dashboard() {
       }
     )
 
-    const lastTransactionEntriesDate = new Date(
-      transactions
-        .filter((transaction: TransactionsProps) => transaction.type === 'up')
-        .slice(-1)
-        .pop()?.date
-    ).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    })
+    const lastTransactionEntriesDate = formattedDate(transactions, 'up')
 
-    const lastTransactionOutputsDate = new Date(
-      transactions
-        .filter((transaction: TransactionsProps) => transaction.type === 'down')
-        .slice(-1)
-        .pop()?.date
-    ).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    })
+    const lastTransactionOutputsDate = formattedDate(transactions, 'down')
 
     setTransactions(transactionsFormatted)
     setHighlightCardData({
@@ -127,17 +133,17 @@ export function Dashboard() {
           <UserInfo>
             <Photo
               source={{
-                uri: 'https://avatars.githubusercontent.com/u/65026455?v=4',
+                uri: user.photo,
               }}
             />
 
             <User>
               <UserGreeting>Olá, </UserGreeting>
-              <UserName>Renato</UserName>
+              <UserName>{user.name}</UserName>
             </User>
           </UserInfo>
 
-          <LogoutButton>
+          <LogoutButton onPress={signOut}>
             <Icon name='power' />
           </LogoutButton>
         </UserWrapper>
@@ -147,13 +153,21 @@ export function Dashboard() {
         <HighlightCard
           title='Entradas'
           amount={highlightCardData?.entries?.total}
-          lastTransaction={`Última entrada dia ${highlightCardData?.entries?.lastTransaction}`}
+          lastTransaction={
+            highlightCardData?.entries?.lastTransaction
+              ? `Última entrada dia ${highlightCardData?.entries?.lastTransaction}`
+              : 'Não há transações'
+          }
           type='up'
         />
         <HighlightCard
           title='Saídas'
           amount={highlightCardData?.outputs?.total}
-          lastTransaction={`Última saída dia ${highlightCardData?.outputs?.lastTransaction}`}
+          lastTransaction={
+            highlightCardData?.outputs?.lastTransaction
+              ? `Última saída dia ${highlightCardData?.outputs?.lastTransaction}`
+              : 'Não há transações'
+          }
           type='down'
         />
         <HighlightCard
@@ -162,7 +176,11 @@ export function Dashboard() {
             highlightCardData?.entries?.total -
             highlightCardData?.outputs?.total
           }
-          lastTransaction={`01 à ${highlightCardData?.outputs?.lastTransaction}`}
+          lastTransaction={
+            highlightCardData?.outputs?.lastTransaction
+              ? `01 à ${highlightCardData?.outputs?.lastTransaction}`
+              : 'Não há transações'
+          }
           type='total'
         />
       </HighlightCards>

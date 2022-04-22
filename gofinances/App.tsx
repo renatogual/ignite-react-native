@@ -1,7 +1,8 @@
 import { StatusBar } from 'react-native'
 import { ThemeProvider } from 'styled-components'
 import AppLoading from 'expo-app-loading'
-import { NavigationContainer } from '@react-navigation/native'
+
+import 'react-native-gesture-handler'
 
 import 'intl'
 import 'intl/locale-data/jsonp/pt-BR'
@@ -15,10 +16,8 @@ import {
 
 import theme from './src/global/styles/theme'
 
-import { AppRoutes } from './src/routes/app.routes'
-import { SignIn } from './src/screens/SignIn'
-
 import { AuthProvider } from './src/hooks/auth'
+import { Routes } from './src/routes'
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -33,18 +32,15 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        {/* Para deixar os icones do status bar em branco devido o header ser colorido */}
-        <StatusBar
-          barStyle='light-content'
-          backgroundColor='transparent'
-          translucent
-        />
-
-        <AuthProvider>
-          <SignIn />
-        </AuthProvider>
-      </NavigationContainer>
+      {/* Para deixar os icones da statusBar em branco devido o header ser colorido */}
+      <StatusBar
+        barStyle='light-content'
+        backgroundColor='transparent'
+        translucent
+      />
+      <AuthProvider>
+        <Routes />
+      </AuthProvider>
     </ThemeProvider>
   )
 }

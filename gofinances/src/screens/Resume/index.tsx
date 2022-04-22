@@ -4,11 +4,13 @@ import { VictoryPie } from 'victory-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { addMonths, subMonths, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useFocusEffect } from '@react-navigation/native'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 import { HistoryCard } from '../../components/HistoryCard'
 
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { categories } from '../../utils/categories'
+import { useAuth } from '../../hooks/auth'
 
 import {
   Container,
@@ -21,7 +23,6 @@ import {
   MonthSelectIcon,
   Month,
 } from './styles'
-import { useFocusEffect } from '@react-navigation/native'
 
 export interface TransactionData {
   type: 'up' | 'down'
@@ -40,6 +41,8 @@ interface CategoryData {
 }
 
 export function Resume() {
+  const { user } = useAuth()
+
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>([])
 
@@ -52,7 +55,7 @@ export function Resume() {
   }
 
   const loadData = useCallback(async () => {
-    const storageKey = '@gofinances:transactions'
+    const storageKey = `@gofinances:transactions_user:${user.id}`
     const response = await AsyncStorage.getItem(storageKey)
     const responseFormatted = response ? JSON.parse(response) : []
 
@@ -96,10 +99,6 @@ export function Resume() {
 
     setTotalByCategories(totalByCategory)
   }, [selectedDate])
-
-  // useEffect(() => {
-  //   loadData()
-  // }, [selectedDate])
 
   useFocusEffect(
     useCallback(() => {

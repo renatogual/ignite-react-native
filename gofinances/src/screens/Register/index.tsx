@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
 
 import {
   Container,
@@ -19,7 +20,8 @@ import { TransactionTypeButton } from '../../components/Forms/TransactionTypeBut
 import { CategorySelectButton } from '../../components/Forms/CategorySelectButton'
 import { CategorySelect } from '../CategorySelect'
 import { InputForm } from '../../components/Forms/InputForm'
-import { useNavigation } from '@react-navigation/native'
+
+import { useAuth } from '../../hooks/auth'
 
 interface FormData {
   [name: string]: any
@@ -44,6 +46,7 @@ const initialCategoryValues = {
 
 export function Register() {
   const navigation = useNavigation<NavigationProps>()
+  const { user } = useAuth()
 
   const [transactionType, setTransactionType] = useState('')
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
@@ -70,20 +73,6 @@ export function Register() {
     setCategoryModalOpen(false)
   }
 
-  // useEffect(() => {
-  //   ;(async function removeStorage() {
-  //     const storageKey = '@gofinances:transactions'
-
-  //     const data = await AsyncStorage.getItem(storageKey)
-
-  //     console.log('before -->>', data)
-
-  //     await AsyncStorage.removeItem(storageKey)
-
-  //     console.log('after -->>', data)
-  //   })()
-  // }, [])
-
   async function handleRegister(form: FormData) {
     if (!transactionType) Alert.alert('Selecione o tipo da transação')
 
@@ -98,7 +87,7 @@ export function Register() {
       date: new Date(),
     }
 
-    const storageKey = '@gofinances:transactions'
+    const storageKey = `@gofinances:transactions_user:${user.id}`
 
     try {
       const data = await AsyncStorage.getItem(storageKey)
