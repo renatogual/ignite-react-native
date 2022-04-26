@@ -20,10 +20,14 @@ import { Button } from "../../components/Button";
 import { Calendar } from "../../components/Calendar";
 
 export function Scheduling() {
-  const { navigate } = useNavigation<any>();
+  const { navigate, goBack } = useNavigation<any>();
 
   function handleConfirmation() {
     navigate("SchedulingDetails");
+  }
+
+  function handleGoBack() {
+    goBack();
   }
 
   return (
@@ -34,7 +38,7 @@ export function Scheduling() {
         backgroundColor="transparent"
       />
       <Header>
-        <BackButton color="white" onPress={() => {}} />
+        <BackButton color="white" onPress={handleGoBack} />
 
         <Title>
           Escolha uma {"\n"}

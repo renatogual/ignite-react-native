@@ -43,16 +43,20 @@ import { Button } from "../../components/Button";
 
 export function SchedulingDetails() {
   const theme = useTheme();
-  const { navigate } = useNavigation<any>();
+  const { navigate, goBack } = useNavigation<any>();
 
   function handleConfirmation() {
     navigate("SchedulingComplete");
   }
 
+  function handleGoBack() {
+    goBack();
+  }
+
   return (
     <Container>
       <Header>
-        <BackButton onPress={() => {}} />
+        <BackButton onPress={handleGoBack} />
       </Header>
 
       <CarImages>
