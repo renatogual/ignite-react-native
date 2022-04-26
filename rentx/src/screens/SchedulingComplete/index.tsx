@@ -1,5 +1,6 @@
 import { StatusBar, useWindowDimensions } from "react-native";
 import { useTheme } from "styled-components";
+import { useNavigation } from "@react-navigation/native";
 
 import {
   Container,
@@ -18,6 +19,11 @@ import { Button } from "../../components/Button";
 export function SchedulingComplete() {
   const { width } = useWindowDimensions();
   const theme = useTheme();
+  const { navigate } = useNavigation<any>();
+
+  function handleConfirmation() {
+    navigate("Home");
+  }
 
   return (
     <Container>
@@ -41,7 +47,11 @@ export function SchedulingComplete() {
 
       <Footer>
         <ContainerButton>
-          <Button title="OK" color={theme.colors.shape_dark} />
+          <Button
+            title="OK"
+            color={theme.colors.shape_dark}
+            onPress={handleConfirmation}
+          />
         </ContainerButton>
       </Footer>
     </Container>
