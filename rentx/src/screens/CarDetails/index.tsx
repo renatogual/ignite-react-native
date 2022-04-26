@@ -35,7 +35,7 @@ export function CarDetails() {
   const { car } = params as Params;
 
   function handleConfirmation() {
-    navigate("Scheduling");
+    navigate("Scheduling", { car });
   }
 
   function handleGoBack() {
