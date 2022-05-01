@@ -54,10 +54,11 @@ interface RentalPeriod {
 }
 
 export function SchedulingDetails() {
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>(
     {} as RentalPeriod
   );
-  const [total, setTotal] = useState(0);
 
   const theme = useTheme();
   const { navigate, goBack } = useNavigation<any>();
@@ -66,12 +67,21 @@ export function SchedulingDetails() {
   const { car, dates } = params as Params;
 
   async function handleConfirmation() {
+    setLoading(true);
+
     const schedulesByCarResponse = await api.get(`/schedules_bycars/${car.id}`);
 
     const unavailable_dates = [
       ...schedulesByCarResponse.data.unavailable_dates,
       ...dates,
     ];
+
+    await api.post("schedules_byuser", {
+      user_id: 1,
+      car,
+      startDate: rentalPeriod.start,
+      endDate: rentalPeriod.end,
+    });
 
     try {
       await api.put(`schedules_bycars/${car.id}`, {
@@ -80,6 +90,7 @@ export function SchedulingDetails() {
       });
       navigate("SchedulingComplete");
     } catch (error) {
+      setLoading(false);
       Alert.alert("Erro ao alugar o veículo");
     }
   }
@@ -174,6 +185,8 @@ export function SchedulingDetails() {
           title="Alugar agora"
           color={theme.colors.success}
           onPress={handleConfirmation}
+          enabled={!loading}
+          loading={loading}
         />
       </Footer>
     </Container>
