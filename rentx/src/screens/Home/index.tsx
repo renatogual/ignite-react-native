@@ -27,7 +27,7 @@ import { api } from "../../services/api";
 import { CarDTO } from "../../dtos/CarDTO";
 
 import { Car } from "../../components/Car";
-import { Load } from "../../components/Load";
+import { LoadAnimation } from "../../components/LoadAnimation";
 
 export function Home() {
   const { navigate } = useNavigation<any>();
@@ -103,7 +103,7 @@ export function Home() {
       </Header>
 
       {loading ? (
-        <Load />
+        <LoadAnimation />
       ) : (
         <CarList
           data={cars}
