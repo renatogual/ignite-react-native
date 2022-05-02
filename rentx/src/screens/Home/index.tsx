@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useNavigation } from "@react-navigation/native";
-import { Alert } from "react-native";
+import { Alert, BackHandler, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { PanGestureHandler } from "react-native-gesture-handler";
+
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import {
   CarList,
@@ -26,6 +33,30 @@ export function Home() {
   const { navigate } = useNavigation<any>();
   const [cars, setCars] = useState<CarDTO[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const positionX = useSharedValue(0);
+  const positionY = useSharedValue(0);
+
+  const myCarsButtonStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: positionX.value },
+        { translateY: positionY.value },
+      ],
+    };
+  });
+
+  const onGestureEvent = useAnimatedGestureHandler({
+    onStart(event, ctx: any) {
+      ctx.positionX = positionX.value;
+      ctx.positionY = positionY.value;
+    },
+    onActive(event, ctx) {
+      positionX.value = ctx.positionX + event.translationX;
+      positionY.value = ctx.positionY + event.translationY;
+    },
+    onEnd() {},
+  });
 
   function handleCarDetails(car: CarDTO) {
     navigate("CarDetails", { car });
@@ -52,13 +83,22 @@ export function Home() {
     })();
   }, []);
 
+  // Impossibilita o retorno a tela de Splash através do BackButton no Android
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      return true;
+    });
+  }, []);
+
   return (
     <Container>
       <StatusBar style="light" backgroundColor="transparent" translucent />
       <Header>
         <HeaderContent>
           <Logo width={RFValue(108)} height={RFValue(12)} />
-          <TotalCars>{`Total de ${cars.length} carros`}</TotalCars>
+          {!loading && (
+            <TotalCars>{`Total de ${cars.length} carros`}</TotalCars>
+          )}
         </HeaderContent>
       </Header>
 
@@ -74,9 +114,21 @@ export function Home() {
         />
       )}
 
-      <MyCarsButton onPress={handleOpenMyCars}>
-        <Ionicons name="ios-car-sharp" size={24} color="#fff" />
-      </MyCarsButton>
+      <PanGestureHandler onGestureEvent={onGestureEvent}>
+        <Animated.View style={[myCarsButtonStyle, styles.buttonAnimated]}>
+          <MyCarsButton onPress={handleOpenMyCars}>
+            <Ionicons name="ios-car-sharp" size={24} color="#fff" />
+          </MyCarsButton>
+        </Animated.View>
+      </PanGestureHandler>
     </Container>
   );
 }
+
+const styles = StyleSheet.create({
+  buttonAnimated: {
+    position: "absolute",
+    bottom: 13,
+    right: 22,
+  },
+});
