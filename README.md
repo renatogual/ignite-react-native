@@ -30,8 +30,12 @@ Além disso, para se destacar como profissional, precisa-se ir além do código.
 
 #### **Chapter II**
 
--   **⚔ [Desafio 1: Criando um hook de carrinho de compras](https://github.com/renatogual/ignite-challenges/tree/master/chapter2-challenge-01)**: Nesse desafio, você deverá criar um hook para gerenciar um carrinho de compras.
--   **🛡 [Desafio 2: Refactoring de classes e TypeScript](https://github.com/renatogual/ignite-challenges/tree/master/chapter2-challenge-02)**: Nesse desafio, você deverá migrar uma aplicação de Javascript e Class Components para Typescript e Function Components.
+-   **⚔ [Desafio 1: SavePass](https://github.com/renatogual/ignite-react-native/tree/main/chapter2-challenge-01)**: Nesse desafio, você irá implementar uma aplicação de gerenciamento de senhas: SavePass. Essa aplicação possui duas telas, sendo a primeira delas uma listagem das senhas salvas e a segunda a tela de cadastro de novos logins
+-   **🛡 [Desafio 2: Login social com a Twitch](https://github.com/renatogual/ignite-challenges/tree/master/chapter2-challenge-02)**: Essa será uma aplicação de login social com a Twitch, onde você vai treinar um pouco mais sobre autenticação e Context API.
+
+#### **Chapter III**  
+
+-   **⚔ [Desafio 1: GitHub Explorer](https://github.com/renatogual/ignite-react-native/tree/main/chapter3-challenge-01)**: Nesse desafio, você irá implementar o GitHub Explorer: um aplicativo que consome a API do GitHub e exibe informações de qualquer repositório público a partir da busca pelo usuario/nome-do-repositorio. Além de implementar animações com a lib react-native-reanimated
 
 ## 📁 Projetos
 - [Go Finances](https://github.com/renatogual/ignite-react-native/tree/main/gofinances)
