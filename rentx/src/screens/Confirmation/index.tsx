@@ -1,6 +1,6 @@
 import { StatusBar, useWindowDimensions } from "react-native";
 import { useTheme } from "styled-components";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import {
   Container,
@@ -16,13 +16,22 @@ import DoneSvg from "../../assets/done.svg";
 
 import { Button } from "../../components/Button";
 
-export function SchedulingComplete() {
+interface ParamsProps {
+  title: string;
+  message: string;
+  nextScreen: string;
+}
+
+export function Confirmation() {
   const { width } = useWindowDimensions();
   const theme = useTheme();
   const { navigate } = useNavigation<any>();
+  const { params } = useRoute();
+
+  const { title, message, nextScreen } = params as ParamsProps;
 
   function handleConfirmation() {
-    navigate("Home");
+    navigate(nextScreen);
   }
 
   return (
@@ -36,13 +45,9 @@ export function SchedulingComplete() {
 
       <Content>
         <DoneSvg width={80} height={80} />
-        <Title>Carro alugado!</Title>
+        <Title>{title}</Title>
 
-        <Message>
-          Agora você só precisa ir {"\n"}
-          até a concessionária da RENTX {"\n"}
-          pegar o seu automóvel.
-        </Message>
+        <Message>{message}</Message>
       </Content>
 
       <Footer>

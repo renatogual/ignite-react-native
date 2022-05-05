@@ -88,7 +88,14 @@ export function SchedulingDetails() {
         id: car.id,
         unavailable_dates,
       });
-      navigate("SchedulingComplete");
+
+      const data = {
+        title: "Carro alugado!",
+        message: `Agora você só precisa ir\naté a concessionária da RENTX\npegar o seu automóvel.`,
+        nextScreen: "Home",
+      };
+
+      navigate("Confirmation", data);
     } catch (error) {
       setLoading(false);
       Alert.alert("Erro ao alugar o veículo");
