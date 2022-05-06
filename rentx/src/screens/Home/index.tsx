@@ -84,11 +84,11 @@ export function Home() {
   }, []);
 
   // Impossibilita o retorno a tela de Splash através do BackButton no Android
-  useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", () => {
-      return true;
-    });
-  }, []);
+  // useEffect(() => {
+  //   BackHandler.addEventListener("hardwareBackPress", () => {
+  //     return true;
+  //   });
+  // }, []);
 
   return (
     <Container>
