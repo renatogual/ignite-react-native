@@ -16,9 +16,11 @@ import { Input } from "../../components/Input";
 import { PasswordInput } from "../../components/PasswordInput";
 
 import theme from "../../styles/theme";
+import { useAuth } from "../../hooks/auth";
 
 export function SignIn() {
   const { navigate } = useNavigation<any>();
+  const { signIn } = useAuth();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [email, setEmail] = useState("");
@@ -34,6 +36,8 @@ export function SignIn() {
       });
 
       await schema.validate({ email, password });
+
+      signIn({ email, password });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         Alert.alert("Opa", error.message);

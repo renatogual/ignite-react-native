@@ -16,6 +16,7 @@ import {
 import { Routes } from "./src/routes";
 
 import theme from "./src/styles/theme";
+import { AuthProvider } from "./src/hooks/auth";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -32,7 +33,9 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Routes />
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </GestureHandlerRootView>
     </ThemeProvider>
   );

@@ -15,6 +15,8 @@ import { Bullet } from "../../../components/Bullet";
 import { Button } from "../../../components/Button";
 import { PasswordInput } from "../../../components/PasswordInput";
 
+import { api } from "../../../services/api";
+
 import {
   Container,
   Header,
@@ -43,12 +45,14 @@ export function SignUpSecondStep() {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleBack() {
     goBack();
   }
 
   async function handleRegister() {
+    setIsLoading(true);
     try {
       const schema = Yup.object().shape({
         password: Yup.string().required("Senha obrigatória"),
@@ -59,17 +63,32 @@ export function SignUpSecondStep() {
 
       await schema.validate({ password, passwordConfirm });
 
-      const data = {
-        title: "Conta criada!",
-        message: `Agora é só fazer login\ne aproveitar.`,
-        nextScreen: "SignIn",
-      };
+      await api
+        .post("users", {
+          name: user.name,
+          email: user.email,
+          driver_license: user.driverLicense,
+          password,
+        })
+        .then(() => {
+          const data = {
+            title: "Conta criada!",
+            message: `Agora é só fazer login\ne aproveitar.`,
+            nextScreen: "SignIn",
+          };
 
-      navigate("Confirmation", data);
+          navigate("Confirmation", data);
+        })
+        .catch((error) => {
+          console.log(error);
+          Alert.alert("Opa", "Não foi possível cadastrar");
+        });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         Alert.alert("Opa", error.message);
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -133,6 +152,7 @@ export function SignUpSecondStep() {
             title="Cadastrar"
             color={theme.colors.success}
             onPress={handleRegister}
+            loading={isLoading}
           />
         </Container>
       </TouchableWithoutFeedback>
