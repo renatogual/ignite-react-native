@@ -67,10 +67,15 @@ export function Home() {
   }
 
   useEffect(() => {
+    let isMounted = true;
+
     (async function getCars() {
       try {
         const response = await api.get("cars");
-        setCars(response.data);
+
+        if (isMounted) {
+          setCars(response.data);
+        }
       } catch (error) {
         console.log(error);
         Alert.alert(
@@ -78,9 +83,15 @@ export function Home() {
           "Houve um erro ao requisitar a listagem de carros !"
         );
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Impossibilita o retorno a tela de Splash através do BackButton no Android
