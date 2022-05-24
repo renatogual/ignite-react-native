@@ -17,6 +17,7 @@ import { PasswordInput } from "../../components/PasswordInput";
 
 import theme from "../../styles/theme";
 import { useAuth } from "../../hooks/auth";
+import { database } from "../../databases";
 
 export function SignIn() {
   const { navigate } = useNavigation<any>();
@@ -55,19 +56,25 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => setKeyboardVisible(false)
-    );
+    (async function getData() {
+      const collection = database.get("users");
+      const users = await collection.query().fetch();
+      console.log(users);
+    })();
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
+    // const keyboardDidShowListener = Keyboard.addListener(
+    //   "keyboardDidShow",
+    //   () => setKeyboardVisible(true)
+    // );
+    // const keyboardDidHideListener = Keyboard.addListener(
+    //   "keyboardDidHide",
+    //   () => setKeyboardVisible(false)
+    // );
+
+    // return () => {
+    //   keyboardDidHideListener.remove();
+    //   keyboardDidShowListener.remove();
+    // };
   }, []);
 
   return (
